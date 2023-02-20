@@ -1,0 +1,93 @@
+version: '2'
+
+networks:
+  keycloak-net:
+  
+services:
+  # ------------------------------------------------------------------------------
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: openldap
+    networks:
+      - keycloak-net
+    environment:
+      LDAP_LOG_LEVEL: "256"
+      LDAP_ORGANISATION: ${LDAP_ORGANISATION}
+      LDAP_DOMAIN: ${LDAP_DOMAIN}
+      LDAP_BASE_DN: ""
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD}
+      LDAP_READONLY_USER: "false"
+      LDAP_RFC2307BIS_SCHEMA: "false"
+      LDAP_BACKEND: "mdb"
+      KEEP_EXISTING_CONFIG: "false"
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
+      LDAP_SSL_HELPER_PREFIX: "ldap"
+    tty: true
+    stdin_open: true
+    volumes:
+      - /var/lib/ldap
+      - /etc/ldap/slapd.d
+      - /container/service/slapd/assets/certs/
+      - ./ldap_file:/container/service/slapd/assets/config/bootstrap/ldif/custom
+    command: "--copy-service"
+    ports:
+      - "389:389"
+      - "636:636"
+    domainname: ${LDAP_DOMAIN}
+    hostname: "ldap-server"
+
+  # ------------------------------------------------------------------------------
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin
+    networks:
+      - keycloak-net
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
+      PHPLDAPADMIN_HTTPS: "false"
+    ports:
+      - "7000:80"
+    depends_on:
+      - openldap
+
+  # ------------------------------------------------------------------------------
+  # For keycloak
+  identity-service-db:
+    image: postgres:14.1-alpine
+    container_name: identity-db
+    networks:
+      - keycloak-net
+    environment:
+      POSTGRES_DB: ${POSTGRESQL_DB}
+      POSTGRES_USER: ${POSTGRESQL_USER}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASS}
+
+  # ------------------------------------------------------------------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:19.0.1
+    container_name: my_keycloak
+    networks:
+      - keycloak-net
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: identity-service-db
+      DB_DATABASE: ${POSTGRESQL_DB}
+      DB_USER: ${POSTGRESQL_USER}
+      DB_SCHEMA: public
+      DB_PASSWORD: ${POSTGRESQL_PASS}
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: "start-dev --import-realm"
+    volumes:
+      - ./realms:/opt/keycloak/data/import
+    ports:
+      - "8080:8080"
+    depends_on:
+      - identity-service-db
+      - openldap
+    healthcheck:
+      test: "curl -f http://localhost:8080/admin || exit 1"
+      
+
+  

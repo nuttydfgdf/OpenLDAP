@@ -1,0 +1,11 @@
+# comment: -------------------------------------------------------
+dn: ou=People,dc=company,dc=org
+changetype: add
+objectclass: organizationalUnit
+ou: People
+
+dn: ou=Groups,dc=company,dc=org
+changetype: add
+objectclass: organizationalUnit
+ou: Groups
+

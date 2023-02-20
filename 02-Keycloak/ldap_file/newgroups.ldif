@@ -1,0 +1,9 @@
+# comment: -------------------------------------------------------
+dn: ou=People,dc=company,dc=org
+objectclass: organizationalUnit
+ou: People
+
+dn: ou=Groups,dc=company,dc=org
+objectclass: organizationalUnit
+ou: Groups
+

@@ -1,0 +1,83 @@
+
+# comment: -------------------------------------------------------
+# comment: Defining the LDAP users.
+# comment: -------------------------------------------------------
+
+# Add John Smith to the organization 
+dn: uid=jsmith1,ou=People,dc=company,dc=org
+objectClass: organizationalPerson
+objectClass: Person
+objectClass: inetOrgPerson
+objectClass: top
+description: John Smith from Accounting.  John is the project
+  manager of the building project, so contact him with any que
+ stions.
+cn: John Smith
+givenname: John
+sn: Smith
+uid: jsmith1
+userpassword: secret
+
+# Add Sally Brown to the organization
+dn: uid=sbrown20,ou=People,dc=company,dc=org
+objectClass: organizationalPerson
+objectClass: Person
+objectClass: inetOrgPerson
+objectClass: top
+description: Sally Brown from engineering.  Sally is responsibl
+ e for designing the blue prints and testing the structural int
+ egrity of the design.
+cn: Sally Brown
+givenname: Sally
+sn: Brown
+uid: sbrown20
+userpassword: secret
+
+# Add Dev to the organization 
+dn: uid=dev1,ou=People,dc=company,dc=org
+objectClass: organizationalPerson
+objectClass: Person
+objectClass: inetOrgPerson
+objectClass: top
+cn: dev1
+givenname: Developer1
+sn: Developer
+uid: dev1
+displayname: Developer User
+mail: developer@gmail.com
+userpassword: secret
+
+# Add Tester to the organization 
+dn: uid=tester1,ou=People,dc=company,dc=org
+objectClass: organizationalPerson
+objectClass: Person
+objectClass: inetOrgPerson
+objectClass: top
+cn: tester1
+givenname: Tester
+sn: Developer
+uid: tester1
+displayname: Tester User
+mail: tester@gmail.com
+userpassword: secret
+
+# comment: -------------------------------------------------------
+# comment: Define the LDAP groups and assign users to these groups.
+dn: cn=support,ou=Groups,dc=company,dc=org
+cn: Support
+objectclass: groupOfUniqueNames
+uniqueMember: cn=support,dc=company,dc=org
+uniqueMember: cn=developer,dc=company,dc=org
+
+dn: cn=developer,ou=Groups,dc=company,dc=org
+cn: developer
+objectclass: groupOfUniqueNames
+uniqueMember: cn=developer,dc=company,dc=org
+uniquemember: uid=jsmith1,ou=People,dc=company,dc=org
+uniquemember: uid=dev1,ou=People,dc=company,dc=org
+
+dn: cn=tester,ou=Groups,dc=company,dc=org
+cn: tester
+objectclass: groupOfUniqueNames
+uniqueMember: cn=tester,dc=company,dc=org
+uniquemember: uid=tester,ou=People,dc=company,dc=org

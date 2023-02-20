@@ -1,0 +1,34 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+- name: admin-api
+  url: http://127.0.0.1:8001
+  routes:
+    - paths:
+      - /admin-api
+  plugins:
+  - name: key-auth
+
+- name: httpbin-service
+  url: https://httpbin.org
+  routes:
+  - name: httpbin
+    paths:
+    - /httpbin
+
+plugins:
+- name: ldap-auth
+  route: httpbin
+  config: 
+    hide_credentials: true
+    ldap_host: ldap.example.com
+    ldap_port: 389
+    base_dn: dc=example,dc=com
+    attribute: cn
+    header_type: ldap
+
+consumers:
+- username: admin
+  keyauth_credentials:
+  - key: secret
